@@ -2,11 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import smtplib
 import google.generativeai as genai
+import os
+
+EMAIL = os.getenv("GMAIL_USER")
+PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 # CONFIG
-URL = "https://example.com/page"
-EMAIL = "your@gmail.com"
-PASSWORD = "your_app_password"
+URL = "https://www.terminalx.com/men/pants/jeans?product_list_order=price_asc"
 
 # Step 1: scrape page
 response = requests.get(URL)
@@ -15,7 +18,7 @@ soup = BeautifulSoup(response.text, "html.parser")
 content = soup.get_text()[:5000]
 
 # Step 2: analyze with Gemini
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
+genai.configure(api_key=API_KEY)
 
 model = genai.GenerativeModel("gemini-pro")
 
@@ -31,5 +34,5 @@ with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
     smtp.sendmail(
         EMAIL,
         EMAIL,
-        f"Subject: AI Website Analysis\n\n{result}"
+        f"Subject: AI TerminalX Results\n\n{result}"
     )
