@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import smtplib
-import google.generativeai as genai
+from google import genai
 import os
 
 EMAIL = os.getenv("GMAIL_USER")
@@ -21,15 +21,14 @@ soup = BeautifulSoup(response.text, "html.parser")
 content = soup.get_text()
 
 # Step 2: analyze with Gemini
-genai.configure(api_key=API_KEY)
+client = genai.Client(api_key=API_KEY)
 
-model = genai.GenerativeModel("gemini-3-flash-preview")
-
-analysis = model.generate_content(
-    f"Summarize in array 'url1,url3,url4,...' all the products with avilable size of {size} and without the words {avoid_words} from this page:\n{content}"
+response = client.models.generate_content(
+    model="gemini-3-flash-preview",
+    contents=f"Summarize in array 'url1,url3,url4,...' all the products with avilable size of {size} and without the words {avoid_words} from this page:\n{content}"
 )
 
-result = analysis.text
+result = response.text
 
 # Step 3: send email
 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
